@@ -3,14 +3,26 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+import csv
+import matplotlib.pyplot as plt
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+with open("C:\\Users\\aleks\\OneDrive\\Pulpit\\CCS\\CCSPythonProject\\dataset_results.csv") as results:
+    csv_reader =csv.DictReader(results)
+    
+    
+    # for row in results :
+    #     category_counter.update(row['Categories'].split(';'))
+    categories = [] # empty list of positive , controversial, negative
+    result = []  #number of pos, cos and neg
+    
+    for row in csv.reader(results):
+        categories.append(row[0])
+        result.append(row[1])
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+plt.bar(categories,result)
+plt.title('Number of obtained reviews in categories')
+plt.xlabel('Categories')  
+plt.ylabel('Number of reviews')
+
+plt.show()
