@@ -1,23 +1,29 @@
-import pandas as pd
+import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
 
-driver = webdriver.Chrome('C:/Users/user/PycharmProjects/webscraping/chromedriver.exe')
-driver.get('https://www.metacritic.com/movie/black-adam/user-reviews')
-results = []
-other_results = []
-content = driver.page_source
-soup = BeautifulSoup(content, features='html.parser')
-driver.quit()
+#import time
+#import random as rand
 
-for element in soup.findAll('span', attrs='review_body'):
-    name = element.find('span')
-    if name not in results:
-        results.append(name.text)
-for b in soup.findAll('span', attrs='title pad_btm_half'):
-    date = element.find('span')
-    if date not in results:
-        other_results.append(date.text)
+import pandas as pd
 
-df = pd.DataFrame({'Names': results, 'Dates': other_results})
-df.to_csv('results.csv', index=True, encoding='utf-8')
+review_dict = {'Name':[], 'Date':[], 'Review':[]}
+
+for page in range(0,2): #Remember to update the number of pages
+    url = 'https://www.metacritic.com/movie/avatar-the-way-of-water/user-reviews?page=' +str(page)
+    user_agent = {'User-agent': 'Chrome/39.0.2171.95'}
+    response  = requests.get(url, headers = user_agent)
+    #time.sleep(rand.randint(3,30))
+    soup = BeautifulSoup(response.text, 'html.parser')
+    for review in soup.find_all('div', class_='review pad_top1'):
+        # if review.find('span', class_='author') == None:
+        #     break
+        review_dict['Name'].append(review.find('span', class_='author').find('a').text)
+        review_dict['Date'].append(review.find('span', class_='date').text)
+        # review_dict['rating'].append(review.find('span', class_='review_grade').find_all('div')[0].text)
+        if review.find('span', class_='blurb blurb_expanded'):
+            review_dict['Review'].append(review.find('span', class_='blurb blurb_expanded').text)
+        else:
+            review_dict['Review'].append(review.find('div', class_='review_body').find('span').text)
+
+sword_reviews = pd.DataFrame(review_dict)
+sword_reviews.to_csv('results.csv', index=False, encoding='utf-8')
