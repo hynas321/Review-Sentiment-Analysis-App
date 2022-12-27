@@ -29,7 +29,7 @@ class StorageAPI:
             for line in file_lines:
                 f.write(line)
 
-        print(f"\n{ConsoleColor.OKGREEN}Blob create successfully.{ConsoleColor.ENDC}")
+        print(f"\n{ConsoleColor.GREEN}Blob created successfully{ConsoleColor.END}")
 
     def list_blobs(self):
         blobs = self.client.list_blobs(self.bucket.name)
@@ -43,11 +43,11 @@ class StorageAPI:
 
             number_of_blobs += 1
 
-        print(f"{ConsoleColor.OKGREEN}Number of displayed blobs: {number_of_blobs}{ConsoleColor.ENDC}\n")
+        print(f"{ConsoleColor.GREEN}Number of displayed blobs: {number_of_blobs}{ConsoleColor.END}\n")
 
     def remove_blob(self, blob_name: str):
         bucket = self.client.bucket(self.bucket.name)
         blob = bucket.blob(f"{blob_name}{self.blob_extension}")
         blob.delete()
 
-        print(f"\n{ConsoleColor.OKGREEN}Blob deleted successfully.{ConsoleColor.ENDC}\n")
+        print(f"\n{ConsoleColor.GREEN}Blob deleted successfully{ConsoleColor.END}\n")

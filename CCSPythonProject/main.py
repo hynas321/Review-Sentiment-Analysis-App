@@ -30,7 +30,9 @@ if __name__ == '__main__':
                 naturalLanguageAPI.display_datasets()
 
             elif input_value == 3:
-                naturalLanguageAPI.remove_dataset(input(f"Enter id: "))
+                naturalLanguageAPI.remove_dataset(
+                    input(f"Enter id: ")
+                )
 
             elif input_value == 4:
                 storageAPI.create_blob(
@@ -42,13 +44,44 @@ if __name__ == '__main__':
                 storageAPI.list_blobs()
 
             elif input_value == 6:
-                storageAPI.remove_blob(input(f"Enter blob's name: "))
+                storageAPI.remove_blob(
+                    input(f"Enter blob's name: ")
+                )
 
             elif input_value == 7:
+                naturalLanguageAPI.create_model(
+                    input(f"Enter model's name: "),
+                    input(f"Enter dataset's id: ")
+                )
+
+            elif input_value == 8:
+                naturalLanguageAPI.deploy_model(
+                    input(f"Enter model's id: "),
+                )
+
+            elif input_value == 9:
+                naturalLanguageAPI.evaluate_model(
+                    input(f"Enter model's id: ")
+                )
+
+            elif input_value == 10:
+                naturalLanguageAPI.apply_model_prediction(
+                    input(f"Enter model's id: ")
+                )
+
+            elif input_value == 11:
+                naturalLanguageAPI.display_models()
+
+            elif input_value == 12:
+                naturalLanguageAPI.remove_model(
+                    input(f"Enter model's id: ")
+                )
+
+            elif input_value == 13:
                 quit(0)
 
             else:
-                print(f"\n{ConsoleColor.FAIL}Incorrect input value{ConsoleColor.ENDC}\n")
+                print(f"\n{ConsoleColor.RED}Incorrect input value{ConsoleColor.END}\n")
 
         except Exception as ex:
-            print(f"{ConsoleColor.FAIL}{ex}{ConsoleColor.ENDC}\n")
+            print(f"{ConsoleColor.RED}{ex}{ConsoleColor.END}\n")
