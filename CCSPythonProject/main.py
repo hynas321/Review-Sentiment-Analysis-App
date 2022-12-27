@@ -78,7 +78,11 @@ if __name__ == '__main__':
                 )
 
             elif input_value == 13:
+                naturalLanguageAPI.display_current_operations()
+
+            elif input_value == 14:
                 quit(0)
+
 
             else:
                 print(f"\n{ConsoleColor.RED}Incorrect input value{ConsoleColor.END}\n")

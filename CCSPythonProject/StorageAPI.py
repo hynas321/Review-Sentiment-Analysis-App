@@ -22,10 +22,10 @@ class StorageAPI:
 
         file_lines = []
 
-        with open(os.path.join(self.csvFilesDirectory, full_file_name), "r") as f:
+        with open(os.path.join(self.csvFilesDirectory, full_file_name), "r", encoding="utf8") as f:
             file_lines.append(f.read())
 
-        with blob.open("w") as f:
+        with blob.open("w", encoding="utf8") as f:
             for line in file_lines:
                 f.write(line)
 

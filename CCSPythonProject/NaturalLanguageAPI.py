@@ -30,11 +30,7 @@ class NaturalLanguageAPI:
 
         print(f"\n{ConsoleColor.GREEN}Dataset created successfully{ConsoleColor.END} {response.result()}")
 
-        dataset_id = response.result().dataset.name.split('/')[-1]
-
-        self.__fill_dataset(dataset_id, blob_name)
-
-        print(f"\n{ConsoleColor.GREEN}Dataset filled with data successfully{ConsoleColor.END} {response.result()}")
+        self.__import_data_to_dataset(response.result().name.split('/')[-1], blob_name)
 
     def display_datasets(self):
         request = automl.ListDatasetsRequest(parent=self.project_location, filter="")
@@ -132,15 +128,31 @@ class NaturalLanguageAPI:
 
         print(f"\n{ConsoleColor.GREEN}Model removed successfully{ConsoleColor.END}\n {response.result()}")
 
-    def __fill_dataset(self, dataset_id: str, blob_name: str):
+    def display_current_operations(self):
+        client = automl.AutoMlClient()
+        response = client._transport.operations_client.list_operations(
+            name=self.project_location, filter_="", timeout=5
+        )
+
+        print("List of operations:")
+        for operation in response:
+            if not operation.done:
+                print("Name: {}".format(operation.name))
+                print(operation.metadata)
+
+    def __import_data_to_dataset(self, dataset_id: str, blob_name: str):
         dataset_full_id = self.client.dataset_path(self.project_id, self.cloud_region, dataset_id)
         blob_path = f"gs://{self.bucket.name}/{blob_name}{self.blob_extension}"
 
-        input_uris = blob_path
-        gcs_source = automl.GcsSource(input_uris=input_uris)
-        input_config = automl.InputConfig(gcs_source=gcs_source)
+        print("Importing data to the dataset...")
 
-        self.client.import_data(
+        input_config = automl.InputConfig(
+            gcs_source=automl.GcsSource(input_uris=[blob_path]),
+        )
+
+        response = self.client.import_data(
             name=dataset_full_id,
             input_config=input_config
         )
+
+        print(f"\n{ConsoleColor.GREEN}Data imported successfully to the dataset{ConsoleColor.END} {response.result()}")
