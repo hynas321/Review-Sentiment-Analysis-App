@@ -1,22 +1,33 @@
 import requests
 from bs4 import BeautifulSoup
-
-#import time
-#import random as rand
-
 import pandas as pd
 
-review_dict = {'Name':[], 'Date':[], 'Review':[]}
+review_dict = {'Name': [], 'Date': [], 'Review': []}
+page_amount = int(1)
 
-for page in range(0,2): #Remember to update the number of pages
-    url = 'https://www.metacritic.com/movie/avatar-the-way-of-water/user-reviews?page=' +str(page)
+url = 'https://www.metacritic.com/movie/puss-in-boots-the-last-wish/user-reviews'
+user_agent = {'User-agent': 'Chrome/39.0.2171.95'}
+response = requests.get(url, headers=user_agent)
+
+soup = BeautifulSoup(response.text, 'html.parser')
+
+for review in soup.find_all('div', class_='pages'):
+    # if 1==2:
+    #     page_amount = type(int(review.find('li', class_='page last_page').find('a').text))
+    if review.find('li', class_='page last_page').find('a').text:
+        page_amount = int(review.find('li', class_='page last_page').find('a').text)
+    else:
+        page_amount = 1
+
+for page in range(0,page_amount): #Remember to update the number of pages
+
+    url = 'https://www.metacritic.com/movie/puss-in-boots-the-last-wish/user-reviews?page=' + str(page)
     user_agent = {'User-agent': 'Chrome/39.0.2171.95'}
-    response  = requests.get(url, headers = user_agent)
-    #time.sleep(rand.randint(3,30))
+    response = requests.get(url, headers=user_agent)
+
     soup = BeautifulSoup(response.text, 'html.parser')
+
     for review in soup.find_all('div', class_='review pad_top1'):
-        # if review.find('span', class_='author') == None:
-        #     break
         review_dict['Name'].append(review.find('span', class_='author').find('a').text)
         review_dict['Date'].append(review.find('span', class_='date').text)
         # review_dict['rating'].append(review.find('span', class_='review_grade').find_all('div')[0].text)
