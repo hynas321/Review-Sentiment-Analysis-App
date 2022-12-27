@@ -21,7 +21,7 @@ if __name__ == '__main__':
                 input_value = -1
 
             if input_value == 1:
-                naturalLanguageAPI.create_dataset(
+                naturalLanguageAPI.create_and_fill_dataset(
                     input(f"Enter the new dataset's display name: "),
                     input("Enter the existing blob's name: ")
                 )
@@ -49,7 +49,7 @@ if __name__ == '__main__':
                 )
 
             elif input_value == 7:
-                naturalLanguageAPI.create_model(
+                naturalLanguageAPI.create_and_train_model(
                     input(f"Enter model's name: "),
                     input(f"Enter dataset's id: ")
                 )

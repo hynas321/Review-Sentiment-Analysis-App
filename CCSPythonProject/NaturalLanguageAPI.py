@@ -15,8 +15,9 @@ class NaturalLanguageAPI:
 
         self.client = automl.AutoMlClient()
         self.bucket = StorageAPI().bucket
+        self.timeoutSeconds = 5
 
-    def create_dataset(self, dataset_display_name: str, blob_name: str):
+    def create_and_fill_dataset(self, dataset_display_name: str, blob_name: str):
         metadata = automl.TextClassificationDatasetMetadata(
             classification_type=automl.ClassificationType.MULTICLASS
         )
@@ -26,15 +27,26 @@ class NaturalLanguageAPI:
             text_classification_dataset_metadata=metadata,
         )
 
-        response = self.client.create_dataset(parent=self.project_location, dataset=new_dataset)
+        response = self.client.create_dataset(
+            parent=self.project_location,
+            dataset=new_dataset,
+            timeout=self.timeoutSeconds
+        )
 
         print(f"\n{ConsoleColor.GREEN}Dataset created successfully{ConsoleColor.END} {response.result()}")
 
         self.__import_data_to_dataset(response.result().name.split('/')[-1], blob_name)
 
     def display_datasets(self):
-        request = automl.ListDatasetsRequest(parent=self.project_location, filter="")
-        response = self.client.list_datasets(request=request)
+        request = automl.ListDatasetsRequest(
+            parent=self.project_location,
+            filter=""
+        )
+
+        response = self.client.list_datasets(
+            request=request,
+            timeout=self.timeoutSeconds
+        )
 
         number_of_datasets: int = 0
 
@@ -50,13 +62,23 @@ class NaturalLanguageAPI:
         print(f"\n{ConsoleColor.GREEN}Number of displayed datasets: {number_of_datasets}{ConsoleColor.END}\n")
 
     def remove_dataset(self, dataset_id: str):
-        dataset_full_id = self.client.dataset_path(self.project_id, self.cloud_region, dataset_id)
-        response = self.client.delete_dataset(name=dataset_full_id)
+        dataset_full_id = self.client.dataset_path(
+            self.project_id,
+            self.cloud_region,
+            dataset_id
+        )
+
+        response = self.client.delete_dataset(
+            name=dataset_full_id,
+            timeout=self.timeoutSeconds
+        )
 
         print(f"\n{ConsoleColor.GREEN}Dataset deleted successfully{ConsoleColor.END} {response.result()}\n")
 
-    def create_model(self, model_display_name: str, dataset_id: str):
+    def create_and_train_model(self, model_display_name: str, dataset_id: str):
         metadata = automl.TextClassificationModelMetadata()
+
+        print(f"{ConsoleColor.GREEN}Creation and training of the model (in the background)...{ConsoleColor.END}")
 
         model = automl.Model(
             display_name=model_display_name,
@@ -64,19 +86,32 @@ class NaturalLanguageAPI:
             text_classification_model_metadata=metadata,
         )
 
-        response = self.client.create_model(parent=self.project_location, model=model)
-
-        print(f"\n{ConsoleColor.GREEN}Model created successfully{ConsoleColor.END} {response.result()}\n")
+        self.client.create_model(
+            parent=self.project_location,
+            model=model,
+            timeout=None
+        )
 
     def deploy_model(self, model_id: str):
-        model_full_id = self.client.model_path(self.project_id, "us-central1", model_id)
+        model_full_id = self.client.model_path(
+            self.project_id,
+            self.cloud_region,
+            model_id
+        )
 
-        response = self.client.deploy_model(name=model_full_id)
+        response = self.client.deploy_model(
+            name=model_full_id,
+            timeout=self.timeoutSeconds
+        )
 
         print(f"\n{ConsoleColor.GREEN}Model deployed successfully{ConsoleColor.END} {response.result()}\n")
 
     def evaluate_model(self, model_id: str):
-        model_full_id = self.client.model_path(self.project_id, "us-central1", model_id)
+        model_full_id = self.client.model_path(
+            self.project_id,
+            self.cloud_region,
+            model_id
+        )
 
         evaluations = self.client.list_model_evaluations(parent=model_full_id, filter="")
 
@@ -96,18 +131,37 @@ class NaturalLanguageAPI:
     def apply_model_prediction(self, model_id: str):
         prediction_client = automl.PredictionServiceClient()
 
-        model_full_id = automl.AutoMlClient.model_path(self.project_id, "us-central1", model_id)
-        text_snippet = automl.TextSnippet(content=self.content, mime_type="text/plain")
-        payload = automl.ExamplePayload(text_snippet=text_snippet)
-        response = prediction_client.predict(name=model_full_id, payload=payload)
+        model_full_id = automl.AutoMlClient.model_path(
+            self.project_id,
+            self.cloud_region,
+            model_id
+        )
+        text_snippet = automl.TextSnippet(
+            content=self.content,
+            mime_type="text/plain"
+        )
+
+        payload = automl.ExamplePayload(
+            text_snippet=text_snippet
+        )
+
+        response = prediction_client.predict(
+            name=model_full_id,
+            payload=payload
+        )
 
         for annotation_payload in response.payload:
             print(u"Predicted class name: {}".format(annotation_payload.display_name))
             print(u"Predicted class score: {}".format(annotation_payload.classification.score))
 
     def display_models(self):
-        request = automl.ListModelsRequest(parent=self.project_location)
-        response = self.client.list_models(request=request)
+        request = automl.ListModelsRequest(
+            parent=self.project_location
+        )
+
+        response = self.client.list_models(
+            request=request
+        )
 
         number_of_models: int = 0
 
@@ -123,14 +177,20 @@ class NaturalLanguageAPI:
         print(f"\n{ConsoleColor.GREEN}Number of displayed models: {number_of_models}{ConsoleColor.END}\n")
 
     def remove_model(self, model_id: str):
-        model_full_id = self.client.model_path(self.project_id, "us-central1", model_id)
-        response = self.client.delete_model(name=model_full_id)
+        model_full_id = self.client.model_path(
+            self.project_id,
+            self.cloud_region,
+            model_id
+        )
+
+        response = self.client.delete_model(
+            name=model_full_id
+        )
 
         print(f"\n{ConsoleColor.GREEN}Model removed successfully{ConsoleColor.END}\n {response.result()}")
 
     def display_current_operations(self):
-        client = automl.AutoMlClient()
-        response = client._transport.operations_client.list_operations(
+        response = self.client._transport.operations_client.list_operations(
             name=self.project_location, filter_="", timeout=5
         )
 
@@ -144,15 +204,14 @@ class NaturalLanguageAPI:
         dataset_full_id = self.client.dataset_path(self.project_id, self.cloud_region, dataset_id)
         blob_path = f"gs://{self.bucket.name}/{blob_name}{self.blob_extension}"
 
-        print("Importing data to the dataset...")
+        print(f"{ConsoleColor.GREEN}Importing data to the dataset (in the background)...{ConsoleColor.END}")
 
         input_config = automl.InputConfig(
             gcs_source=automl.GcsSource(input_uris=[blob_path]),
         )
 
-        response = self.client.import_data(
+        self.client.import_data(
             name=dataset_full_id,
-            input_config=input_config
+            input_config=input_config,
+            timeout=None
         )
-
-        print(f"\n{ConsoleColor.GREEN}Data imported successfully to the dataset{ConsoleColor.END} {response.result()}")
