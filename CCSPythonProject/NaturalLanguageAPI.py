@@ -101,10 +101,10 @@ class NaturalLanguageAPI:
 
         response = self.client.deploy_model(
             name=model_full_id,
-            timeout=self.timeoutSeconds
+            timeout=None
         )
 
-        print(f"\n{ConsoleColor.GREEN}Model deployed successfully{ConsoleColor.END} {response.result()}\n")
+        print(f"\n{ConsoleColor.GREEN}Model is being deployed (in the background)...{ConsoleColor.END} {response.result()}\n")
 
     def evaluate_model(self, model_id: str):
         model_full_id = self.client.model_path(
