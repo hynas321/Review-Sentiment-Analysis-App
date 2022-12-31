@@ -55,18 +55,19 @@ if __name__ == '__main__':
                 )
 
             elif input_value == 8:
-                naturalLanguageAPI.deploy_model(
-                    input(f"Enter model's id: "),
-                )
-
-            elif input_value == 9:
                 naturalLanguageAPI.evaluate_model(
                     input(f"Enter model's id: ")
                 )
 
+            elif input_value == 9:
+                naturalLanguageAPI.deploy_model(
+                    input(f"Enter model's id: "),
+                )
+
             elif input_value == 10:
                 naturalLanguageAPI.apply_model_prediction(
-                    input(f"Enter model's id: ")
+                    input(f"Enter model's id: "),
+                    input(f"Enter filename: ")
                 )
 
             elif input_value == 11:

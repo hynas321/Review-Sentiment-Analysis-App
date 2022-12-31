@@ -1,3 +1,6 @@
+import csv
+import os
+
 from ConfigVariables import ConfigVariables
 from ConsoleColor import ConsoleColor
 from google.cloud import automl
@@ -12,6 +15,7 @@ class NaturalLanguageAPI:
         self.credentials = ConfigVariables.googleCloudCredentials
         self.cloud_region = ConfigVariables.googleCloudRegion
         self.blob_extension = ConfigVariables.blobExtension
+        self.predictionCsvFilesLocation = ConfigVariables.localPredictionCsvFilesLocation
 
         self.client = automl.AutoMlClient()
         self.bucket = StorageAPI().bucket
@@ -92,20 +96,6 @@ class NaturalLanguageAPI:
             timeout=None
         )
 
-    def deploy_model(self, model_id: str):
-        model_full_id = self.client.model_path(
-            self.project_id,
-            self.cloud_region,
-            model_id
-        )
-
-        response = self.client.deploy_model(
-            name=model_full_id,
-            timeout=None
-        )
-
-        print(f"\n{ConsoleColor.GREEN}Model is being deployed (in the background)...{ConsoleColor.END} {response.result()}\n")
-
     def evaluate_model(self, model_id: str):
         model_full_id = self.client.model_path(
             self.project_id,
@@ -128,7 +118,20 @@ class NaturalLanguageAPI:
                 )
             )
 
-    def apply_model_prediction(self, model_id: str):
+    def deploy_model(self, model_id: str):
+        model_full_id = self.client.model_path(
+            self.project_id,
+            self.cloud_region,
+            model_id
+        )
+
+        self.client.deploy_model(
+            name=model_full_id,
+            timeout=None
+        )
+
+    def apply_model_prediction(self, model_id: str, file_name: str):
+        full_file_name = f"{file_name}{self.blob_extension}"
         prediction_client = automl.PredictionServiceClient()
 
         model_full_id = automl.AutoMlClient.model_path(
@@ -136,20 +139,30 @@ class NaturalLanguageAPI:
             self.cloud_region,
             model_id
         )
+
+        # Read the CSV file and extract the data
+        with open(os.path.join(self.predictionCsvFilesLocation, full_file_name), "r") as csv_file:
+            reader = csv.reader(csv_file)
+            data = [row[0] for row in reader]
+
+        # Convert the data into a TextSnippet object
         text_snippet = automl.TextSnippet(
-            content=self.content,
+            content="\n".join(data),
             mime_type="text/plain"
         )
 
+        # Create an ExamplePayload object with the TextSnippet object
         payload = automl.ExamplePayload(
             text_snippet=text_snippet
         )
 
+        # Make the prediction request
         response = prediction_client.predict(
             name=model_full_id,
             payload=payload
         )
 
+        # Print the prediction results
         for annotation_payload in response.payload:
             print(u"Predicted class name: {}".format(annotation_payload.display_name))
             print(u"Predicted class score: {}".format(annotation_payload.classification.score))

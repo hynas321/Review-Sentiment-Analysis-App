@@ -10,5 +10,7 @@ class ConfigVariables:
         os.path.join(pythonProjectRootDirectory, "google-cloud-credentials.json")
     googleCloudBucketName = "datasets_ccs"
     blobExtension = ".csv"
-    localCsvFilesFolder = "ReviewFiles"
-    localCsvFilesLocation = os.path.join(pythonProjectRootDirectory, localCsvFilesFolder)
+    localDatasetCsvFilesFolder = "ReviewsForDataset"
+    localDatasetCsvFilesLocation = os.path.join(pythonProjectRootDirectory, localDatasetCsvFilesFolder)
+    localPredictionCsvFilesFolder = "ReviewsForPrediction"
+    localPredictionCsvFilesLocation = os.path.join(pythonProjectRootDirectory, localPredictionCsvFilesFolder)

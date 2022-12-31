@@ -8,7 +8,7 @@ from google.cloud import storage
 class StorageAPI:
 
     def __init__(self):
-        self.csvFilesDirectory = ConfigVariables.localCsvFilesLocation
+        self.csvFilesDirectory = ConfigVariables.localDatasetCsvFilesLocation
         self.client = storage.Client()
         self.bucket = self.client.bucket(ConfigVariables.googleCloudBucketName)
         self.blob_extension = ConfigVariables.blobExtension
