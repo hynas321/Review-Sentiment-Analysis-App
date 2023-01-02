@@ -37,5 +37,5 @@ for page in range(0, page_amount):
         else:
             review_dict['Review'].append(review.find('div', class_='review_body').find('span').text)
 
-sword_reviews = pd.DataFrame(review_dict)
-sword_reviews.to_csv('results.csv', index=False, encoding='utf-8')
+reviews = pd.DataFrame(review_dict)
+reviews.to_csv('results.csv', index=False, encoding='utf-8')
