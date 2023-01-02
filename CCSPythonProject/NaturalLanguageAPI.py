@@ -5,6 +5,7 @@ from ConfigVariables import ConfigVariables
 from ConsoleColor import ConsoleColor
 from google.cloud import automl
 from StorageAPI import StorageAPI
+from datetime import datetime
 
 
 class NaturalLanguageAPI:
@@ -16,6 +17,7 @@ class NaturalLanguageAPI:
         self.cloud_region = ConfigVariables.googleCloudRegion
         self.blob_extension = ConfigVariables.blobExtension
         self.predictionCsvFilesLocation = ConfigVariables.localPredictionCsvFilesLocation
+        self.resultCsvFilesLocation = ConfigVariables.localResultCsvFilesLocation
 
         self.client = automl.AutoMlClient()
         self.bucket = StorageAPI().bucket
@@ -140,32 +142,46 @@ class NaturalLanguageAPI:
             model_id
         )
 
-        # Read the CSV file and extract the data
+        print(f"{ConsoleColor.GREEN}Model prediction in progress, please do not close the program...{ConsoleColor.END}")
+
+        now = datetime.now()
+        output_file_name = now.strftime("%Y-%m-%d") + "-" + now.strftime("%H-%M-%S") + "-" + full_file_name
+
+        output_file = open(os.path.join(self.resultCsvFilesLocation, output_file_name), "a")
+
         with open(os.path.join(self.predictionCsvFilesLocation, full_file_name), "r") as csv_file:
             reader = csv.reader(csv_file)
             data = [row[0] for row in reader]
 
-        # Convert the data into a TextSnippet object
-        text_snippet = automl.TextSnippet(
-            content="\n".join(data),
-            mime_type="text/plain"
-        )
+        for i, snippet in enumerate(data):
+            text_snippet = automl.TextSnippet(
+                content=snippet,
+                mime_type="text/plain"
+            )
 
-        # Create an ExamplePayload object with the TextSnippet object
-        payload = automl.ExamplePayload(
-            text_snippet=text_snippet
-        )
+            payload = automl.ExamplePayload(
+                text_snippet=text_snippet
+            )
 
-        # Make the prediction request
-        response = prediction_client.predict(
-            name=model_full_id,
-            payload=payload
-        )
+            response = prediction_client.predict(
+                name=model_full_id,
+                payload=payload
+            )
 
-        # Print the prediction results
-        for annotation_payload in response.payload:
-            print(u"Predicted class name: {}".format(annotation_payload.display_name))
-            print(u"Predicted class score: {}".format(annotation_payload.classification.score))
+            categories = {
+                "positive": 0,
+                "negative": 0,
+                "controversial": 0
+            }
+
+            for annotation_payload in response.payload:
+                categories[annotation_payload.display_name] = annotation_payload.classification.score
+
+            max_value_key = max(categories, key=categories.get)
+            output_file.write(f"{snippet.replace(',', '')},{max_value_key}\n")
+
+        output_file.close()
+        print("Model prediction has been finished, the result file has been saved")
 
     def display_models(self):
         request = automl.ListModelsRequest(

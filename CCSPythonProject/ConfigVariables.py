@@ -14,3 +14,5 @@ class ConfigVariables:
     localDatasetCsvFilesLocation = os.path.join(pythonProjectRootDirectory, localDatasetCsvFilesFolder)
     localPredictionCsvFilesFolder = "ReviewsForPrediction"
     localPredictionCsvFilesLocation = os.path.join(pythonProjectRootDirectory, localPredictionCsvFilesFolder)
+    localResultCsvFilesFolder = "ReviewsPredictionResult"
+    localResultCsvFilesLocation = os.path.join(pythonProjectRootDirectory, localResultCsvFilesFolder)

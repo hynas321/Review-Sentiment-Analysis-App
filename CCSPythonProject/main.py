@@ -21,31 +21,31 @@ if __name__ == '__main__':
                 input_value = -1
 
             if input_value == 1:
-                naturalLanguageAPI.create_and_fill_dataset(
-                    input(f"Enter the new dataset's display name: "),
-                    input("Enter the existing blob's name: ")
-                )
-
-            elif input_value == 2:
-                naturalLanguageAPI.display_datasets()
-
-            elif input_value == 3:
-                naturalLanguageAPI.remove_dataset(
-                    input(f"Enter id: ")
-                )
-
-            elif input_value == 4:
                 storageAPI.create_blob(
                     input("Enter the new blob's name: "),
                     input("Enter the existing file's name: ")
                 )
 
-            elif input_value == 5:
+            elif input_value == 2:
                 storageAPI.list_blobs()
 
-            elif input_value == 6:
+            elif input_value == 3:
                 storageAPI.remove_blob(
                     input(f"Enter blob's name: ")
+                )
+
+            elif input_value == 4:
+                naturalLanguageAPI.create_and_fill_dataset(
+                    input(f"Enter the new dataset's display name: "),
+                    input("Enter the existing blob's name: ")
+                )
+
+            elif input_value == 5:
+                naturalLanguageAPI.display_datasets()
+
+            elif input_value == 6:
+                naturalLanguageAPI.remove_dataset(
+                    input(f"Enter id: ")
                 )
 
             elif input_value == 7:
@@ -83,7 +83,6 @@ if __name__ == '__main__':
 
             elif input_value == 14:
                 quit(0)
-
 
             else:
                 print(f"\n{ConsoleColor.RED}Incorrect input value{ConsoleColor.END}\n")
