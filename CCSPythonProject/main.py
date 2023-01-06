@@ -2,6 +2,7 @@ from ConsoleColor import ConsoleColor
 from Menu import Menu
 from NaturalLanguageAPI import NaturalLanguageAPI
 from StorageAPI import StorageAPI
+from WebScraper import WebScraper
 
 if __name__ == '__main__':
     while True:
@@ -12,6 +13,7 @@ if __name__ == '__main__':
             menu: Menu = Menu()
             naturalLanguageAPI = NaturalLanguageAPI()
             storageAPI = StorageAPI()
+            webScraper = WebScraper()
 
             menu.display()
 
@@ -20,6 +22,10 @@ if __name__ == '__main__':
             except TypeError:
                 input_value = -1
 
+            if input_value == 0:
+                webScraper.web_scrape(
+                    input("Enter the film's URL: ")
+                )
             if input_value == 1:
                 storageAPI.create_blob(
                     input("Enter the new blob's name: "),
