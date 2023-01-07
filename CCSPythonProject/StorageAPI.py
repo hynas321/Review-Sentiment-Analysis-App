@@ -1,5 +1,4 @@
 import os
-
 from ConfigVariables import ConfigVariables
 from ConsoleColor import ConsoleColor
 from google.cloud import storage

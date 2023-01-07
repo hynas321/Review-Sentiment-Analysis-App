@@ -1,5 +1,6 @@
 import csv
 import os
+from time import sleep
 
 from ConfigVariables import ConfigVariables
 from ConsoleColor import ConsoleColor
@@ -132,7 +133,7 @@ class NaturalLanguageAPI:
             timeout=None
         )
 
-    def apply_model_prediction(self, model_id: str, file_name: str):
+    def apply_model_prediction(self, model_id: str, file_name: str) -> str:
         full_file_name = f"{file_name}{self.blob_extension}"
         prediction_client = automl.PredictionServiceClient()
 
@@ -146,14 +147,18 @@ class NaturalLanguageAPI:
 
         now = datetime.now()
         output_file_name = now.strftime("%Y-%m-%d") + "-" + now.strftime("%H-%M-%S") + "-" + full_file_name
+        output_file_path = os.path.join(self.resultCsvFilesLocation, output_file_name)
 
-        output_file = open(os.path.join(self.resultCsvFilesLocation, output_file_name), "a")
+        output_file = open(output_file_path, "a", encoding="UTF-8")
 
-        with open(os.path.join(self.predictionCsvFilesLocation, full_file_name), "r") as csv_file:
+        with open(os.path.join(self.predictionCsvFilesLocation, full_file_name), "r", encoding="UTF-8") as csv_file:
             reader = csv.reader(csv_file)
             data = [row[0] for row in reader]
 
         for i, snippet in enumerate(data):
+            # Prediction is slowed down to avoid errors from Vertex AI
+            sleep(0.5)
+
             text_snippet = automl.TextSnippet(
                 content=snippet,
                 mime_type="text/plain"
@@ -182,6 +187,8 @@ class NaturalLanguageAPI:
 
         output_file.close()
         print("Model prediction has been finished, the result file has been saved")
+
+        return output_file_path
 
     def display_models(self):
         request = automl.ListModelsRequest(
@@ -219,12 +226,12 @@ class NaturalLanguageAPI:
         print(f"\n{ConsoleColor.GREEN}Model removed successfully{ConsoleColor.END}\n {response.result()}")
 
     def display_current_operations(self):
-        response = self.client._transport.operations_client.list_operations(
+        request = self.client._transport.operations_client.list_operations(
             name=self.project_location, filter_="", timeout=5
         )
 
         print("List of operations:")
-        for operation in response:
+        for operation in request:
             if not operation.done:
                 print("Name: {}".format(operation.name))
                 print(operation.metadata)
