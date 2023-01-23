@@ -1,7 +1,9 @@
 from ConsoleColor import ConsoleColor
+from GraphCreator import GraphCreator
 from Menu import Menu
 from NaturalLanguageAPI import NaturalLanguageAPI
 from StorageAPI import StorageAPI
+from WebScraper import WebScraper
 
 if __name__ == '__main__':
     while True:
@@ -12,6 +14,8 @@ if __name__ == '__main__':
             menu: Menu = Menu()
             naturalLanguageAPI = NaturalLanguageAPI()
             storageAPI = StorageAPI()
+            webScraper = WebScraper()
+            graphCreator = GraphCreator()
 
             menu.display()
 
@@ -21,67 +25,74 @@ if __name__ == '__main__':
                 input_value = -1
 
             if input_value == 1:
+                webScraper.web_scrape(
+                    input("Enter the film's URL on Metacritic: ")
+                )
+
+            elif input_value == 2:
                 storageAPI.create_blob(
                     input("Enter the new blob's name: "),
                     input("Enter the existing file's name: ")
                 )
 
-            elif input_value == 2:
+            elif input_value == 3:
                 storageAPI.list_blobs()
 
-            elif input_value == 3:
+            elif input_value == 4:
                 storageAPI.remove_blob(
                     input(f"Enter blob's name: ")
                 )
 
-            elif input_value == 4:
+            elif input_value == 5:
                 naturalLanguageAPI.create_and_fill_dataset(
                     input(f"Enter the new dataset's display name: "),
                     input("Enter the existing blob's name: ")
                 )
 
-            elif input_value == 5:
+            elif input_value == 6:
                 naturalLanguageAPI.display_datasets()
 
-            elif input_value == 6:
+            elif input_value == 7:
                 naturalLanguageAPI.remove_dataset(
                     input(f"Enter id: ")
                 )
 
-            elif input_value == 7:
+            elif input_value == 8:
                 naturalLanguageAPI.create_and_train_model(
                     input(f"Enter model's name: "),
                     input(f"Enter dataset's id: ")
                 )
 
-            elif input_value == 8:
+            elif input_value == 9:
                 naturalLanguageAPI.evaluate_model(
                     input(f"Enter model's id: ")
                 )
 
-            elif input_value == 9:
+            elif input_value == 10:
                 naturalLanguageAPI.deploy_model(
                     input(f"Enter model's id: "),
                 )
 
-            elif input_value == 10:
-                naturalLanguageAPI.apply_model_prediction(
+            elif input_value == 11:
+                output_file_path = naturalLanguageAPI.apply_model_prediction(
                     input(f"Enter model's id: "),
                     input(f"Enter filename: ")
                 )
 
-            elif input_value == 11:
-                naturalLanguageAPI.display_models()
+                graphCreator.plot_review_categories(output_file_path)
 
             elif input_value == 12:
+                naturalLanguageAPI.display_models()
+
+            elif input_value == 13:
                 naturalLanguageAPI.remove_model(
                     input(f"Enter model's id: ")
                 )
 
-            elif input_value == 13:
+            elif input_value == 14:
                 naturalLanguageAPI.display_current_operations()
 
-            elif input_value == 14:
+            elif input_value == 15:
                 quit(0)
 
             else:
