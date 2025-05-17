@@ -1,9 +1,6 @@
-# Review Bombing Detector
+# Review-Sentiment-Analysis-App
 
-## Description
-**Review bombing** is an Internet phenomenon in which multiple accounts post negative reviews online with the intent to hurt the sales or popularity of a product, service, or business.
-
-**Review Bombing Detector** is a Python program that uses **Vertex AI** and **Google Cloud Storage** in order to classify reviews posted online based on their **sentiment**.
+**Review-Sentiment-Analysis-App** is a Python program that uses **Vertex AI** and **Google Cloud Storage** in order to classify reviews posted online based on their **sentiment**.
 
 There are three categories of sentiment: **positive**, **negative** and **controversial**. Based on the number of controversial reviews and the number of all reviews in total, one can determine if the review bombing is likely to have occured.
  
